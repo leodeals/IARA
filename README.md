@@ -10,7 +10,7 @@ IARA is designed to fit your workflow. You can run it three ways:
 3. **As a Google Colab Notebook:** For a zero-install, cloud-based prediction directly in your browser.
    [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/leodeals/IARA/blob/main/IARA_Colab.ipynb)
 
-## 👩‍🔬 Getting Started: A Quick Guide on the Basics of Computational Tools for Biologists
+## 👩‍🔬 Getting Started: A Quick Guide on the Basics of Computational Tools for Unexperienced Users
 *If you are comfortable with the command line and Conda, please skip to the [Quick Start (For Experienced Users)](#-quick-start-for-experienced-users) below!*
 
 Welcome! Setting up deep learning tools for the first time can feel incredibly daunting because computational papers often assume you already know a lot of jargon. I want you to be able to use IARA effortlessly either from a terminal or from right inside PyMOL or ChimeraX, without needing a computer science degree. I am going to walk you through exactly what these terms mean and how to set everything up, step-by-step.
