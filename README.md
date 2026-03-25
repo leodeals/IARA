@@ -2,7 +2,7 @@
 
 > *"Iara is the mother of the waters. In Brazilian folklore, she shapes the rivers and the depths. In structural biology, it is the displacement and structuring of water—the hydrophobic effect—that fundamentally drives proteins to fold, bind, and interact."*
 
-**IARA** is a Graph Neural Network (GNN) trained on synthetic protein interfaces (generated via RFdiffusion) to predict chemically favorable, high-confidence binding hotspots on natural protein surfaces. Unbound by evolutionary history, IARA identifies the optimal binding sites for *de novo* binder engineering.
+**IARA** is a Graph Neural Network (GNN) able to predict the optimal binding sites for *de novo* binder generation with RFdiffusion, BindCraft and BoltzGen.
 
 IARA is designed to fit your workflow. You can run it three ways:
 1. **As a Standalone Command-Line Script:** For batch processing and integration into other pipelines.
@@ -13,7 +13,7 @@ IARA is designed to fit your workflow. You can run it three ways:
 ## 👩‍🔬 Getting Started: A Quick Guide on the Basics of Computational Tools for Biologists
 *If you are comfortable with the command line and Conda, please skip to the [Quick Start (For Experienced Users)](#-quick-start-for-experienced-users) below!*
 
-Welcome! Setting up deep learning tools for the first time can feel incredibly daunting because computational papers often assume you already know a lot of jargon. We want you to be able to use IARA effortlessly either from a terminal or from right inside PyMOL or ChimeraX, without needing a computer science degree. We are going to walk you through exactly what these terms mean and how to set everything up, step-by-step.
+Welcome! Setting up deep learning tools for the first time can feel incredibly daunting because computational papers often assume you already know a lot of jargon. I want you to be able to use IARA effortlessly either from a terminal or from right inside PyMOL or ChimeraX, without needing a computer science degree. I am going to walk you through exactly what these terms mean and how to set everything up, step-by-step.
 
 ### 1. What is Conda, and why do I need it?
 IARA runs on **PyTorch**, a complex underlying AI engine that requires very specific, matched versions of code (Python) and math libraries to function. If we mix different versions, the program crashes. 
@@ -48,20 +48,39 @@ pip install torch torch-geometric prody pandas scipy
 ```
 **Congratulations!** The hard computational part is over. You never have to type those setup commands again.
 
-### 3. Downloading IARA
+### 3. Downloading IARA 📥
 1. Go to our official repository: [https://github.com/leodeals/IARA](https://github.com/leodeals/IARA)
-2. Follow the standard process to download the repository folder (usually clicking the green "Code" button -> "Download ZIP"). Unzip this folder on your Desktop or in your Documents.
+2. Follow the standard process to download the repository folder (usually clicking the green "Code" button -> "Download ZIP"). Unzip this file in a folder where the script will be stored.
+   **(If you are the type of person with the "barbaric habit" of keeping absolutely everything on your desktop or the downloads folder, I won't hold this against you ⚔️🛡️).**
 3. Keep the AI brain (`IARA.pth`) securely *inside* that unzipped folder, right next to the file called `predict.py`. Without the brain, the code won't know what to do!
 
-### 4. Running IARA from the Command Line
-You can run IARA directly from your Terminal! This is great if you want to process many structural files at once.
+### 4. Running IARA from the Command Line 🧑‍💻
+You can run IARA directly from your Terminal! This is great if you want to process many structural files at once, or if you're the kind of person who enjoys looking intensely at black screens with scrolling text to impress your lab mates.
+
 1. Make sure your terminal is open and your bubble is active (you should see `(iara_env)` on the left side of the prompt). If not, type `conda activate iara_env`.
 2. Tell your terminal to travel into the IARA folder you just downloaded. For example, if you unzipped it on your Desktop, type `cd Desktop/IARA` and press Enter.
-3. To predict the hotspots for a protein (let's say you have a file called `target.pdb` in that folder), type:
-   `python predict.py --model IARA.pth --input target.pdb --outdir predictions/`
-Your computer will think for a moment and automatically save the results inside a new `predictions/` folder!
+3. You can process a **single PDB file** or an **entire folder of PDBs at once**!
 
-### 5. Installing the PyMOL or ChimeraX Plugins
+Here are the only commands you need to worry about:
+
+| Flag | Status | What it does | Example |
+|---|---|---|---|
+| `--input` | **Obligatory 🚨** | Points to your target PDB file, OR a whole folder containing multiple PDBs. | `--input target.pdb` <br> `--input /my_pdbs/` |
+| `--model` | *Optional* 🤷‍♂️ | Points to the AI brain. You only need this if you moved `IARA.pth` away from `predict.py`. | `--model /custom/path/IARA.pth` |
+| `--outdir` | *Optional* 📁 | Saves the scored files into a specific folder. By default, it just saves them right next to the original files! | `--outdir predictions/` |
+
+**Example 1: Scoring a Single Protein** (let's say you have a file called `target.pdb` in that folder)
+```bash
+python predict.py --input target.pdb
+```
+That's it! Your computer will think for a moment and automatically save the results locally. 
+
+**Example 2: Scoring a Full Folder** (because doing things manually one-by-one is for peasants 👑)
+```bash
+python predict.py --input /path/to/my/folder/of/pdbs/ --outdir predictions/
+```
+
+### 5. Installing the PyMOL or ChimeraX Plugins 🎨
 If you prefer visual tools instead of the command line, we can connect IARA seamlessly to the 3D software you already know and love!
 
 **For PyMOL:**
@@ -80,13 +99,18 @@ If you prefer visual tools instead of the command line, we can connect IARA seam
 
 *(We permanently save this configuration setting on your computer, so next week when you restart your computer, you only ever need to do step #2!)*
 
-### 6. Running Your First Prediction in 3D!
+### 6. Running Your First Prediction in 3D! 🧊
 You are all set! Load any protein structure you want into your viewport (for example, in PyMOL you can type `fetch 1cse`).
 To let the AI scan the surface and find the optimal binding hotspots, just type:
 * **PyMOL:** `iara_predict 1cse`
 * **ChimeraX:** `iara_predict #1`
 
 Your screen will freeze for a few seconds while the GNN thinks, and then your protein will seamlessly update with a 3D heatmap! The regions colored **deep red** (probability > 50%) are the high-confidence binding hotspots perfect for *de novo* design. 
+
+#### Wait, I didn't install the Plugin! How do I visualize it manually? 🧐
+If you ran the command-line script from Step 4 and just got back a `_IARA.pdb` file, here is how you manually reveal the heatmap:
+* **In PyMOL:** Open the `_IARA.pdb` file, click the command line, type `spectrum b, white red` and press Enter. (Boom. Magic. 🪄)
+* **In ChimeraX:** Open the `_IARA.pdb` file, go to your top menu bar, click **Tools -> Depiction -> Render by Attribute**, make sure the attribute is set to `b-factor`, select your color palette, and apply!
 
 ---
 
@@ -102,14 +126,27 @@ conda activate prospector_env
 ```
 Ensure you have downloaded the model weights (`IARA.pth`) to the repository root.
 
-**Predicting a Single Structure**
+**Minimal Call (recommended)**
 ```bash
-python predict.py --model IARA.pth --input target.pdb --outdir predictions/
+# --model and --outdir are optional:
+# model defaults to IARA.pth next to predict.py
+# output defaults to the same folder as the input
+python predict.py --input target.pdb
 ```
 
-**Batch Directory Prediction**
+**Single Structure — custom output folder**
 ```bash
-python predict.py --model IARA.pth --input /path/to/pdbs/ --outdir predictions/
+python predict.py --input target.pdb --outdir predictions/
+```
+
+**Batch Directory**
+```bash
+python predict.py --input /path/to/pdbs/
+```
+
+**Override model path (only if IARA.pth was moved)**
+```bash
+python predict.py --input target.pdb --model /custom/path/IARA.pth
 ```
 
 ### GUI Plugin Installation
