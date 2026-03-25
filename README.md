@@ -51,7 +51,7 @@ pip install torch torch-geometric prody pandas scipy
 ### 3. Downloading IARA 📥
 1. Go to our official repository: [https://github.com/leodeals/IARA](https://github.com/leodeals/IARA)
 2. Follow the standard process to download the repository folder (usually clicking the green "Code" button -> "Download ZIP"). Unzip this file in a folder where the script will be stored.
-   **(If you are the type of person with the "barbaric habit" of keeping absolutely everything on your desktop or the downloads folder, I won't hold this against you ⚔️🛡️).**
+   **(If you are the type of person with the "barbaric habit" ⚔️🛡️ of keeping absolutely everything on your desktop or the downloads folder, I won't hold this against you).**
 3. Keep the AI brain (`IARA.pth`) securely *inside* that unzipped folder, right next to the file called `predict.py`. Without the brain, the code won't know what to do!
 
 ### 4. Running IARA from the Command Line 🧑‍💻
@@ -109,7 +109,7 @@ Your screen will freeze for a few seconds while the GNN thinks, and then your pr
 
 #### Wait, I didn't install the Plugin! How do I visualize it manually? 🧐
 If you ran the command-line script from Step 4 and just got back a `_IARA.pdb` file, here is how you manually reveal the heatmap:
-* **In PyMOL:** Open the `_IARA.pdb` file, click the command line, type `spectrum b, white red` and press Enter. (Boom. Magic. 🪄)
+* **In PyMOL:** Open the `_IARA.pdb` file, click the command line, type `spectrum b, blue_white_red, minimum=0, maximum=100` and press Enter. (Boom. Magic. 🪄)
 * **In ChimeraX:** Open the `_IARA.pdb` file, go to your top menu bar, click **Tools -> Depiction -> Render by Attribute**, make sure the attribute is set to `b-factor`, select your color palette, and apply!
 
 ---
