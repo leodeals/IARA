@@ -60,6 +60,7 @@ You can run IARA directly from your Terminal! This is great if you want to proce
 1. Make sure your terminal is open and your bubble is active (you should see `(iara_env)` on the left side of the prompt). If not, type `conda activate iara_env`.
 2. Tell your terminal to travel into the IARA folder you just downloaded. For example, if you unzipped it on your Desktop, type `cd Desktop/IARA` and press Enter.
 3. You can process a **single PDB file** or an **entire folder of PDBs at once**!
+4. IARA also accepts protein complexes and the predictions will look at the complex surface as a whole. ‼️ **for this reason, if you run an isolated subunit you will get a slightly different prediction from the full complex, as new interaction surfaces are revealed and cross-subunit interfaces may be lost** ‼️
 
 Here are the only commands you need to worry about:
 
