@@ -2,7 +2,7 @@
 
 > *"Iara is the mother of the waters. In Brazilian folklore, she shapes the rivers and the depths. In structural biology, it is the displacement and structuring of water—the hydrophobic effect—that fundamentally drives proteins to fold, bind, and interact."*
 
-**IARA** is a Graph Neural Network (GNN) able to predict the optimal binding sites for *de novo* binder generation with RFdiffusion, BindCraft and BoltzGen.
+**IARA** is a Graph Neural Network (GNN) able to predict regions most likely to yield successful *de novo* binders with RFdiffusion, BindCraft and BoltzGen.
 
 IARA is designed to fit your workflow. You can run it three ways:
 1. **As a Standalone Command-Line Script:** For batch processing and integration into other pipelines.
