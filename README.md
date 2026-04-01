@@ -1,6 +1,6 @@
 # IARA: Interface Analysis and Recognition Architecture
 
-> *"Iara is the mother of the waters. In Brazilian folklore, she shapes the rivers and the depths. In structural biology, it is the displacement and structuring of water—the hydrophobic effect—that fundamentally drives proteins to fold, bind, and interact."*
+> *"Iara is the mother of the waters. In Brazilian folklore, she shapes the rivers and the depths. In structural biology, it is the displacement and structuring of water—the hydrophobic effect—that fundamentally drives proteins to fold and interact."*
 
 **IARA** is a Graph Neural Network (GNN) able to predict regions most likely to yield successful *de novo* binders with RFdiffusion, BindCraft and BoltzGen.
 
