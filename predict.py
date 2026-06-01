@@ -1,4 +1,5 @@
 import os
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'  # Prevents macOS OpenMP duplicate-runtime abort
 import sys
 import glob
 import argparse
@@ -117,13 +118,21 @@ def score_structure(input_file, model, device, output_dir):
         print(f"   ❌ Error processing {input_file}: {e}")
 
 # --- MAIN RUNNER ---
+# Default model path: IARA.pth living next to this script
+_DEFAULT_MODEL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "IARA.pth")
+
 def main():
     parser = argparse.ArgumentParser(description="IARA Inference Tool - Interface Analysis and Recognition Architecture")
     parser.add_argument("-i", "--input", required=True, help="Input directory OR a single .pdb / .cif file")
-    parser.add_argument("-o", "--outdir", default="scored_predictions", help="Output directory to save scored PDBs")
-    parser.add_argument("-m", "--model", required=True, help="Path to the IARA.pth model file")
+    parser.add_argument("-o", "--outdir", default=None, help="Output directory to save scored PDBs (default: same folder as input)")
+    parser.add_argument("-m", "--model", default=_DEFAULT_MODEL, help=f"Path to IARA.pth weights (default: {_DEFAULT_MODEL})")
     
     args = parser.parse_args()
+
+    # Resolve output directory: default to same location as the input
+    if args.outdir is None:
+        input_path_for_default = Path(args.input)
+        args.outdir = str(input_path_for_default if input_path_for_default.is_dir() else input_path_for_default.parent)
 
     print("\n🌊 IARA Inference (Interface Analysis and Recognition Architecture)\n")
 
@@ -170,7 +179,7 @@ def main():
         score_structure(file_path, model, device, args.outdir)
 
     print(f"\n✨ Complete! All predicted structures saved to '{args.outdir}/'.")
-    print("🎨 Open these structures in PyMOL and color by B-factor to visualize the hotspots!")
+    print("🎨 Use spectrum b, blue_white_red, maximum=100, minimum=0 to visualize the hotspots in pymol!")
 
 if __name__ == "__main__":
     main()

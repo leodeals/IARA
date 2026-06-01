@@ -1,4 +1,4 @@
-name: prospector_env
+name: iara_env
 channels:
   - pyg
   - pytorch
@@ -10,7 +10,7 @@ dependencies:
   - pytorch
   - torchvision
   - torchaudio
-  - pytorch-cuda=11.8 # Update according to local CUDA version if desired
+  - pytorch-cuda # Let conda resolve the local CUDA version automatically
   - pyg
   - pandas
   - scipy

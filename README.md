@@ -87,14 +87,14 @@ If you prefer visual tools instead of the command line, we can connect IARA seam
 **For PyMOL:**
 1. Open PyMOL normally.
 2. In PyMOL's command line box (at the top or bottom of the screen), type `run ` and then drag-and-drop the `iara_plugin_pymol.py` file from your unzipped folder into the PyMOL window to auto-fill the path, like this:
-   `run /Users/yourname/Desktop/IARA/Deployment/PyMOL/iara_plugin_pymol.py` and press Enter.
+   `run /Users/yourname/Desktop/IARA/PyMOL/iara_plugin_pymol.py` and press Enter.
 3. Tell the plugin where the AI brain is located by typing `iara_configure ` and dragging your main unzipped `IARA` folder into PyMOL:
    `iara_configure /Users/yourname/Desktop/IARA` and press Enter.
 
 **For UCSF ChimeraX:**
 1. Open ChimeraX.
 2. In the ChimeraX command line prompt at the bottom, type `open ` and drag-and-drop the `iara_plugin_chimerax.py` file:
-   `open /Users/yourname/Desktop/IARA/Deployment/ChimeraX/iara_plugin_chimerax.py`
+   `open /Users/yourname/Desktop/IARA/ChimeraX/iara_plugin_chimerax.py`
 3. Tell the plugin where the AI brain is located by typing `iara_configure ` and dragging your main unzipped `IARA` folder into ChimeraX:
    `iara_configure /Users/yourname/Desktop/IARA`
 
@@ -123,9 +123,11 @@ If you ran the command-line script from Step 4 and just got back a `_IARA.pdb` f
 git clone https://github.com/leodeals/IARA
 cd IARA
 conda env create -f environment.yml
-conda activate prospector_env
+conda activate iara_env
 ```
 Ensure you have downloaded the model weights (`IARA.pth`) to the repository root.
+
+*(Note: The environment file leaves the CUDA version unpinned so Conda can detect your hardware automatically. If installation fails, you can explicitly set your local CUDA version inside `environment.yml`)*
 
 **Minimal Call (recommended)**
 ```bash
@@ -154,8 +156,8 @@ python predict.py --input target.pdb --model /custom/path/IARA.pth
 
 Make sure your Conda environment is named `iara_env`, or see the override below.
 
-- **PyMOL:** `run /path/to/IARA/Deployment/PyMOL/iara_plugin_pymol.py`
-- **ChimeraX:** `open /path/to/IARA/Deployment/ChimeraX/iara_plugin_chimerax.py`
+- **PyMOL:** `run /path/to/IARA/PyMOL/iara_plugin_pymol.py`
+- **ChimeraX:** `open /path/to/IARA/ChimeraX/iara_plugin_chimerax.py`
 
 **Configuration (Run Once):**
 ```bash
