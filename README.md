@@ -235,17 +235,6 @@ Because IARA runs in seconds on standard CPU hardware without requiring a GPU, i
 
 In practice, when using IARA for large proteins or complexes we recommend following a **two-stage protocol**:
 
-```mermaid
-graph TD
-    A["Stage 1: Full length protein or Complex Scan<br/>(Run IARA on full assembly)"] --> B["Select Viable Subunit/Domain<br/>(Pick chain with prominent hot patches)"]
-    B --> C["Extract / Crop Subunit<br/>(Prepare target for generative tool)"]
-    C --> D["Stage 2: Re-run IARA on Cropped Subunit<br/>(Check for newly exposed interface 'sinks')"]
-    D --> E{"New unwanted interface hot?"}
-    E -- "Yes (Sink detected)" --> F["In Silico Lysine Masking<br/>(Mutate exposed interface residues to Lysine)"]
-    F --> D
-    E -- "No (Clean target)" --> G["Downstream Generation<br/>(Launch generative binder pipeline)"]
-```
-
 ### Stage 1: Global Complex Scan (Whole Assembly)
 For multi-protein assemblies or large proteins, feed the intact structure into IARA first. This rapidly maps the entire surface landscape, allowing you to identify which specific subunits or domains contain viable, high-confidence designable patches (scores > 50, colored red).
 
