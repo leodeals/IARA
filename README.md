@@ -64,18 +64,6 @@ You can run IARA directly from your Terminal! This is great if you want to proce
 2. Tell your terminal to travel into the IARA folder you just downloaded. For example, if you unzipped it on your Desktop, type `cd Desktop/IARA` and press Enter.
 3. You can process a **single PDB file** or an **entire folder of PDBs at once**!
 
-Here are the commands and flags available:
-
-| Flag | Status | What it does | Example |
-|---|---|---|---|
-| `--input`, `-i` | **Obligatory 🚨** | Points to your target PDB/CIF file, OR a whole folder containing multiple structures (`.pdb`, `.cif`, `.pdb.gz`, `.ent`). | `--input target.pdb`<br>`--input /my_pdbs/` |
-| `--outdir`, `-o` | *Optional* 📁 | Saves the scored files into a specific folder. By default, it saves them right next to the input files! | `--outdir predictions/` |
-| `--model`, `-m` | *Optional* 🤷‍♂️ | Points to the AI brain. You only need this if you moved `IARA.pth` away from `predict.py`. | `--model /custom/path/IARA.pth` |
-| `-e` or `--extensive` | *Optional* 🧬 | Generates additional `_patches.json` and `.txt` files grouping hot residues into spatial patches. | `-e` |
-| `-t` or `--threshold` | *Optional* 🎚️ | Minimum IARA score for a residue to be considered 'hot' in the patch grouping (default: `60.0`). | `-t 50` |
-| `-d` or `--distance` | *Optional* 📏 | Maximum CA–CA distance (Å) to connect residues into the same patch (default: `5.0`). | `-d 8.0` |
-| `-s` or `--min-size` | *Optional* 🧩 | Minimum number of connected hot residues required to form a valid patch (default: `3`). | `-s 5` |
-
 **Example 1: Scoring a Single Protein**
 ```bash
 python predict.py --input target.pdb
