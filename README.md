@@ -233,11 +233,11 @@ Generative design tools are computationally expensive. Forcing them to target bi
 
 Because IARA runs in seconds on standard CPU hardware without requiring a GPU, it should be used as an **upstream structural triage tool** to guide where to aim computational resources before launching binder generation runs.
 
-In practice, we recommend following a **two-stage protocol**:
+In practice, when using IARA for large proteins or complexes we recommend following a **two-stage protocol**:
 
 ```mermaid
 graph TD
-    A["Stage 1: Global Complex Scan<br/>(Run IARA on full assembly)"] --> B["Select Viable Subunit/Domain<br/>(Pick chain with prominent hot patches)"]
+    A["Stage 1: Full length protein or Complex Scan<br/>(Run IARA on full assembly)"] --> B["Select Viable Subunit/Domain<br/>(Pick chain with prominent hot patches)"]
     B --> C["Extract / Crop Subunit<br/>(Prepare target for generative tool)"]
     C --> D["Stage 2: Re-run IARA on Cropped Subunit<br/>(Check for newly exposed interface 'sinks')"]
     D --> E{"New unwanted interface hot?"}
