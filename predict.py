@@ -4,6 +4,7 @@ import sys
 import glob
 import argparse
 import warnings
+import json
 import torch
 import torch.nn as nn
 import numpy as np
@@ -69,7 +70,57 @@ def smooth_predictions(coords, probs, radius=8.0):
         smoothed[i] = (probs[i] + np.mean(probs[nb])) / 2.0
     return smoothed
 
-def score_structure(input_file, model, device, output_dir):
+def extract_patches(ca_atoms, probs, threshold=0.60, distance=8.0, min_size=3):
+    """
+    Extracts spatial patches of residues with IARA scores > threshold.
+    Returns a list of patches, where each patch is a list of atom indices.
+    """
+    hot_indices = [i for i, p in enumerate(probs) if p > threshold]
+    if not hot_indices:
+        return []
+        
+    coords = ca_atoms.getCoords()
+    hot_coords = coords[hot_indices]
+    
+    # Build tree for just the hot residues
+    tree = cKDTree(hot_coords)
+    pairs = tree.query_pairs(r=distance)
+    
+    # Build adjacency list for BFS
+    adj = {i: [] for i in range(len(hot_indices))}
+    for i, j in pairs:
+        adj[i].append(j)
+        adj[j].append(i)
+        
+    # BFS to find connected components
+    visited = set()
+    patches = []
+    
+    for i in range(len(hot_indices)):
+        if i not in visited:
+            component = []
+            queue = [i]
+            visited.add(i)
+            
+            while queue:
+                node = queue.pop(0)
+                component.append(hot_indices[node])
+                for neighbor in adj[node]:
+                    if neighbor not in visited:
+                        visited.add(neighbor)
+                        queue.append(neighbor)
+                        
+            if len(component) >= min_size:
+                # Sort component by score (descending)
+                component.sort(key=lambda idx: probs[idx], reverse=True)
+                patches.append(component)
+                
+    # Sort patches by maximum score in the patch (descending)
+    if patches:
+        patches.sort(key=lambda p: probs[p[0]], reverse=True)
+    return patches
+
+def score_structure(input_file, model, device, output_dir, extensive=False, threshold=60.0, distance=5.0, min_size=3):
     try:
         struct = parsePDB(input_file)
         if struct is None:
@@ -112,7 +163,74 @@ def score_structure(input_file, model, device, output_dir):
         out_path = os.path.join(output_dir, out_name)
 
         writePDB(out_path, sv)
-        print(f"   ✅ Scored {file_path.name} -> Saved to {out_path}")
+        
+        # --- Export ALL predictions to JSON (custom single-line formatting for readability) ---
+        all_preds = []
+        for i, p in enumerate(smooth_p):
+            atom = ca_atoms[i]
+            ch = atom.getChid()
+            resnum = atom.getResnum()
+            resname = atom.getResname()
+            score = float(p * 100.0)
+            all_preds.append({"residue": f"{ch}{resnum}", "resname": resname, "score": round(score, 1)})
+            
+        json_lines = ["{", f'  "target_file": "{file_path.name}",', '  "predictions": [']
+        pred_strs = []
+        for p_dict in all_preds:
+            pred_strs.append('    {"residue": "' + p_dict["residue"] + '", "resname": "' + p_dict["resname"] + '", "score": ' + str(p_dict["score"]) + '}')
+        json_lines.append(",\n".join(pred_strs))
+        json_lines.append("  ]")
+        json_lines.append("}")
+        
+        json_all_out = os.path.join(output_dir, f"{file_path.stem}_IARA.json")
+        with open(json_all_out, "w") as f:
+            f.write("\n".join(json_lines))
+            
+        print(f"   ✅ Scored {file_path.name} -> Saved to {out_path} and {json_all_out}")
+
+        # Generate extensive JSON/TXT outputs if flag is set
+        if extensive:
+            patches = extract_patches(ca_atoms, smooth_p, threshold=threshold/100.0, distance=distance, min_size=min_size)
+            if not patches:
+                print(f"   ℹ️  No hot patches found for {file_path.name} (>60 score).")
+                return
+
+            json_data = {}
+            txt_lines = []
+            
+            for patch_idx, patch_atoms in enumerate(patches):
+                patch_name = f"Patch {patch_idx + 1}"
+                txt_lines.append(f"{patch_name}")
+                patch_data = []
+                
+                for idx in patch_atoms:
+                    atom = ca_atoms[idx]
+                    ch = atom.getChid()
+                    resnum = atom.getResnum()
+                    resname = atom.getResname()
+                    score = float(smooth_p[idx] * 100.0)
+                    
+                    patch_data.append({
+                        "residue": f"{ch}{resnum}",
+                        "resname": resname,
+                        "score": round(score, 1)
+                    })
+                    txt_lines.append(f"{ch}{resnum} {resname} {round(score, 1)}")
+                    
+                json_data[patch_name.lower().replace(' ', '_')] = patch_data
+                txt_lines.append("") # Empty line between patches
+                
+            # Write JSON
+            json_out = os.path.join(output_dir, f"{file_path.stem}_IARA_patches.json")
+            with open(json_out, "w") as f:
+                json.dump(json_data, f, indent=2)
+                
+            # Write TXT
+            txt_out = os.path.join(output_dir, f"{file_path.stem}_IARA_patches.txt")
+            with open(txt_out, "w") as f:
+                f.write("\n".join(txt_lines).strip())
+                
+            print(f"   📄 Generated patch files: {json_out} and {txt_out}")
 
     except Exception as e:
         print(f"   ❌ Error processing {input_file}: {e}")
@@ -126,6 +244,10 @@ def main():
     parser.add_argument("-i", "--input", required=True, help="Input directory OR a single .pdb / .cif file")
     parser.add_argument("-o", "--outdir", default=None, help="Output directory to save scored PDBs (default: same folder as input)")
     parser.add_argument("-m", "--model", default=_DEFAULT_MODEL, help=f"Path to IARA.pth weights (default: {_DEFAULT_MODEL})")
+    parser.add_argument("-e", "--extensive", action="store_true", help="Generate extensive outputs: grouping hot residues into patches and saving as JSON and TXT")
+    parser.add_argument("-t", "--threshold", type=float, default=60.0, help="IARA score threshold for a residue to be considered hot (default: 60)")
+    parser.add_argument("-d", "--distance", type=float, default=5.0, help="Maximum CA-CA distance (in A) to group residues into the same patch (default: 5.0)")
+    parser.add_argument("-s", "--min-size", type=int, default=3, help="Minimum number of residues required to form a patch (default: 3)")
     
     args = parser.parse_args()
 
@@ -176,7 +298,7 @@ def main():
     
     # 4. Process Inputs
     for file_path in files_to_process:
-        score_structure(file_path, model, device, args.outdir)
+        score_structure(file_path, model, device, args.outdir, extensive=args.extensive, threshold=args.threshold, distance=args.distance, min_size=args.min_size)
 
     print(f"\n✨ Complete! All predicted structures saved to '{args.outdir}/'.")
     print("🎨 Use spectrum b, blue_white_red, maximum=100, minimum=0 to visualize the hotspots in pymol!")
